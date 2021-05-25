@@ -1,0 +1,7 @@
+ruler.vue 为一个vue的组件，使用是只需将其引入，标签上设置ref属性(用于父组件找到该组件)，之后调用组件的方法：
+                                                                                                                    vm.$refs.ruler.setRuler({
+                                                                                                                            scaleBaseWidth:50,   //1cm的px长度
+                                                                                                                            scaleNum:10,          //绘制几厘米的长度
+                                                                                                                            scaleColor:'#333',          //刻度线颜色
+                                                                                                                            rulerBgColor:'yellow'           //尺子背景色
+                                                                                                                     })
