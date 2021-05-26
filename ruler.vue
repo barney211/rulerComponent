@@ -1,10 +1,11 @@
 <template>
-    <div :style="rulerStyle" id="ruler">
-        <div id="scaleBlock" style="display: flex"></div>
+    <div :style="rulerStyle" id="ruler" class="rulerBlock">
+        <div id="scaleBlock" :style="scaleBlockStyle"></div>
         <div id="numBlock" :style="numBlockStyle"></div>
-        <div :style="{fontSize:'12px',color:scaleColor}">cm</div>
+        <div :style="unitStyle">cm</div>
     </div>
 </template>
+
 
 <script>
     let vm;
@@ -19,30 +20,46 @@
                   left:'20px',
                   zIndex:99999,
                   width:'200px',
-                  height:'55px',
+                  height:'56px',
                   backgroundColor:'#fff',
-                  paddingLeft:'10px',
                 },
                 numBlockStyle:{
                     display: 'flex',
-                    justifyContent: 'space-between',
+                     justifyContent: 'space-between',
+                     paddingLeft:'2px',
+                     width:'180px;'
+                },
+                scaleBlockStyle:{
+                    display: 'flex',
+                    //justifyContent: 'space-between',  //刻度绘制方法2
+                    paddingLeft:'10px',
                     width:'180px;'
+                },
+                unitStyle:{
+                    fontSize:'12px',
+                    color:'#333',
+                    paddingLeft:'8px'
                 }
             }
         },
         methods: {
-            setRuler(params){
+            setNormalRuler(params){
                if(params.scaleBaseWidth&&params.scaleNum){
                    vm.rulerStyle.width=(params.scaleBaseWidth*params.scaleNum+20)+'px'
                }
                if(params.scaleColor){
-                   vm.scaleColor=params.scaleColor
+                   vm.scaleColor=params.scaleColor;
+                   vm.unitStyle.color=vm.scaleColor
                }
                if(params.rulerBgColor){
                    vm.rulerStyle.backgroundColor=params.rulerBgColor
                }
 
+
+               vm.unitStyle.paddingLeft='8px';
+
                let marginRight=(params.scaleBaseWidth*params.scaleNum-(params.scaleNum*10+1))/(params.scaleNum*10);
+               // vm.scaleBlockStyle.width=(params.scaleBaseWidth*params.scaleNum+10)+'px';  //刻度绘制方法2
 
                let html='';
                for(let i=0;i<params.scaleNum*10+1;i++){
@@ -53,27 +70,73 @@
                            html+="<div  style='margin-right: "+marginRight+"px;background-color:"+vm.scaleColor+";width:1px;height: 20px;'></div>"
                        }
 
+                      // html+="<div style='margin-right:0;background-color:"+vm.scaleColor+";width:1px;height: 20px;'></div>" //刻度绘制方法2
                    }else if(i%10==5){//半厘米时
                        html+="<div  style='margin-right: "+marginRight+"px;background-color: "+vm.scaleColor+";width:1px;height: 15px;'></div>"
+                      // html+="<div  style='background-color: "+vm.scaleColor+";width:1px;height: 15px;'></div>"  //刻度绘制方法2
                    }else{
                        html+="<div  style='margin-right:"+marginRight+"px;background-color: "+vm.scaleColor+";width:1px;height: 10px;'></div>"
+                       //html+="<div  style='background-color: "+vm.scaleColor+";width:1px;height: 10px;'></div>"  //刻度绘制方法2
                    }
                }
                document.getElementById('scaleBlock').innerHTML=html;
 
-               let numMarginRight=(params.scaleBaseWidth*params.scaleNum-(params.scaleNum+1)*12)/(params.scaleNum);
-                vm.numBlockStyle.width=(params.scaleBaseWidth*params.scaleNum)+'px';
+                vm.numBlockStyle.width=(params.scaleBaseWidth*params.scaleNum+16)+'px';
                let html_1='';
                 for(let i=0;i<params.scaleNum+1;i++){
-                    if(i==params.scaleNum){
-                        html_1+="<div  style='color: "+vm.scaleColor+";font-size: 12px;'>"+i+"</div>"
-                    }else{
-                        html_1+="<div  style='margin-right: "+numMarginRight+"px;color: "+vm.scaleColor+";font-size: 12px;'>"+i+"</div>"
-                    }
+                    html_1+="<div  style='color: "+vm.scaleColor+";font-size: 12px;text-align: center;width: 16px'>"+i+"</div>"
                 }
                 document.getElementById('numBlock').innerHTML=html_1;
 
             },
+            setVerticalRuler(params){
+                vm.rulerStyle.width='56px';
+                if(params.scaleBaseWidth&&params.scaleNum){
+                    vm.rulerStyle.height=(params.scaleBaseWidth*params.scaleNum+20)+'px'
+                }
+                if(params.scaleColor){
+                    vm.scaleColor=params.scaleColor
+                    vm.unitStyle.color=vm.scaleColor
+                }
+                if(params.rulerBgColor){
+                    vm.rulerStyle.backgroundColor=params.rulerBgColor
+                }
+
+                vm.rulerStyle.display='flex';
+                vm.scaleBlockStyle.paddingLeft='0px';
+                vm.scaleBlockStyle.paddingTop='10px';
+                vm.scaleBlockStyle.flexDirection='column';
+                vm.numBlockStyle.flexDirection='column';
+                vm.numBlockStyle.paddingTop='2px';
+                vm.unitStyle.paddingLeft='1px';
+
+                let marginBottom=(params.scaleBaseWidth*params.scaleNum-(params.scaleNum*10+1))/(params.scaleNum*10);
+
+                let html='';
+                for(let i=0;i<params.scaleNum*10+1;i++){
+                    if(i%10==0){//整厘米时
+                        if(i==params.scaleNum*10){ //最后一个刻度不需要设置marginright
+                            html+="<div style='margin-bottom:0;background-color:"+vm.scaleColor+";width:20px;height: 1px;'></div>"
+                        }else{
+                            html+="<div  style='margin-bottom: "+marginBottom+"px;background-color:"+vm.scaleColor+";width:20px;height: 1px;'></div>"
+                        }
+                    }else if(i%10==5){//半厘米时
+                        html+="<div  style='margin-bottom: "+marginBottom+"px;background-color: "+vm.scaleColor+";width:15px;height: 1px;'></div>"
+                    }else{
+                        html+="<div  style='margin-bottom:"+marginBottom+"px;background-color: "+vm.scaleColor+";width:10px;height: 1px;'></div>"
+                    }
+                }
+                document.getElementById('scaleBlock').innerHTML=html;
+
+                vm.numBlockStyle.height=(params.scaleBaseWidth*params.scaleNum+16)+'px';
+                let html_1='';
+                for(let i=0;i<params.scaleNum+1;i++){
+                    html_1+="<div  style='color: "+vm.scaleColor+";font-size: 12px;text-align: center;height: 16px;transform: rotate(-90deg);vertical-align: center'>"+(params.scaleNum-i)+"</div>"
+                }
+                document.getElementById('numBlock').innerHTML=html_1;
+
+
+            }
         },
         components: {},
         mounted() {
@@ -116,6 +179,7 @@
                     }
                 }
             }
+
         },
         destroyed() {
         }
